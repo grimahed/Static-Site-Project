@@ -1,6 +1,8 @@
 import unittest
 from htmlnode import HTMLNode
 from htmlnode import LeafNode
+from htmlnode import ParentNode
+
 gc = HTMLNode("Hey I exist too")
 child = HTMLNode("it worked", children=[gc])
 parent = HTMLNode("testing node...", None, children=[child])
@@ -26,5 +28,61 @@ class TestHtmlNode(unittest.TestCase):
         self.assertEqual(node.to_html(), "<p>Hello, Grim!</p>")
         self.assertNotEqual(node2.to_html(), "<strong> DMC2 is peak</strong>")
         self.assertEqual(node3.to_html(), '<a href="https://google.com">Click me!</a>')
+
+    def test_to_html_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        print(parent_node)
+        self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_grandchildren(self):
+        #gc_n = grandchild node
+
+        gc_n = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [gc_n])
+        parent_node = ParentNode("div", [child_node])
+        print(parent_node)
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+        )
+    
+    def test_to_html_gc_prop(self):
+         #gc_n = grandchild node
+
+        gc_n = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [gc_n], {"href": "https://google.com"})
+        parent_node = ParentNode("div", [child_node])
+        print(parent_node)
+        self.assertEqual(
+            parent_node.to_html(),
+            '<div><span href="https://google.com"><b>grandchild</b></span></div>',
+        )
+
+    def test_to_html_great_grandchildren(self):
+        #ggc_n = greatgrandchild node, so on.
+
+        ggc_n = LeafNode("strong", "great-grandchild")
+        gc_n = ParentNode("b", [ggc_n])
+        child_node = ParentNode("span", [gc_n])
+        parent_node = ParentNode("div", [child_node])
+        print(parent_node)
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b><strong>great-grandchild</strong></b></span></div>",
+        )
+
+    def test_to_html_great_grandchildren_prop(self):
+        #ggc_n = greatgrandchild node, so on.
+
+        ggc_n = LeafNode("strong", "great-grandchild")
+        gc_n = ParentNode("b", [ggc_n])
+        child_node = ParentNode("span", [gc_n])
+        parent_node = ParentNode("div", [child_node], {"href": "https://google.com"})
+        print(parent_node)
+        self.assertEqual(
+            parent_node.to_html(),
+            '<div href="https://google.com"><span><b><strong>great-grandchild</strong></b></span></div>',
+        )
 if __name__ == "__main__":
     unittest.main()
