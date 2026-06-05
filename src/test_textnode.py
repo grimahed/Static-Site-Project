@@ -11,9 +11,13 @@ class TestTextNode(unittest.TestCase):
         node6 = TextNode(None, TextType.LINK)
         node7 = TextNode("this is a test node image.jpeg", TextType.IMAGE)
         node8 = TextNode("fooled you, back to JS purgatory", TextType.LINK, "https://www.aq.com/")
+        print("---BASE TEXTNODE tests---\n")
+        print(node8)
+        print("\n----------------\n")
         self.assertNotEqual(node2, node3)
         self.assertNotEqual(node4, node5)
         self.assertNotEqual(node6, node7)
         self.assertNotEqual(node6, node8)
+        
 if __name__ == "__main__":
     unittest.main()
