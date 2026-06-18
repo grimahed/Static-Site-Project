@@ -1,6 +1,63 @@
+import os
+import shutil
+from pathlib import Path
 from enum import Enum
-from textnode import TextNode
-from textnode import TextType
+from textnode import *
+from htmlnode import *
+from blocktypes import *
+#extract stuff
+def extract_title(markdown):
+        blocks = markdown_to_blocks(markdown)
+        for block in blocks:
+            block_type = block_to_block_type(block)
+            if block_type == BlockType.HEADING:
+                new_block = block[2:]
+                finalized = new_block.strip()
+                return finalized
+            elif block_type != BlockType.HEADING:
+                continue
+        raise Exception("no heading to return")
+
+#generate the page
+def generate_page(from_path, template_path, dest_path):
+    print(f"generating page from {from_path} to {dest_path} using {template_path}")
+    
+    #from_path stuff
+    with open(from_path, "r") as f:
+        read_from_file = f.read() #read as in pronounced "red"
+    #template path stuff
+    with open(template_path, "r") as t:
+        read_template_file = t.read() #same here
+    
+    #getting stuff and making html stuff
+    md_html_node = markdown_to_html_node(read_from_file)
+    md_html = md_html_node.to_html() #the actual string
+    title = extract_title(read_from_file)
+
+    #build thing
+    built_html = read_template_file
+    built_html2 = built_html.replace("{{ Title }}", title)
+    final_html = built_html2.replace("{{ Content }}", md_html)
+
+    #write the thing
+    dirs = os.path.dirname(dest_path)
+    os.makedirs(dirs, exist_ok=True)
+    with open(dest_path, "w") as d:
+        uploaded_html = d.write(final_html)
+    
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for filepath in os.listdir(dir_path_content):
+        from_path = os.path.join(dir_path_content, filepath)
+        dest_path = os.path.join(dest_dir_path, filepath)   
+        if os.path.isfile(from_path):
+            html_filepath = str(Path(dest_path).with_suffix(".html"))
+            page = generate_page(from_path, template_path, html_filepath)
+        elif os.path.isdir(from_path):
+            generate_pages_recursive(from_path, template_path, dest_path)
+
+
+
+
 
 def main():
     text = "this is text"
@@ -8,6 +65,28 @@ def main():
     url = "https://www.aq.com"
     Sample = TextNode(text, text_type, url)
     print(Sample)
+
+    def rec_copy_stuff(source, dest):
+        #delete the entire public directory and create a new one
+        if os.path.exists(dest):
+            shutil.rmtree(dest)
+            os.mkdir(dest)
+        else:
+            os.mkdir(dest)
+        
+        #copy everything
+        stuff = os.listdir(source)
+        for thing in stuff:
+            file_path = os.path.join(source, thing)
+            dest_path = os.path.join(dest, thing)
+            if os.path.isfile(file_path):
+                shutil.copy(file_path, dest_path)
+            elif os.path.isdir(file_path):
+                rec_copy_stuff(file_path, dest_path)
+    rec_copy_stuff("static", "public")
+    generate_pages_recursive("content", "template.html", "public")
+    
+        
 
 
 if __name__ == "__main__":

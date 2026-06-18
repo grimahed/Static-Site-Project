@@ -186,3 +186,5 @@ This is another paragraph with _italic_ text and `code` here
         print(html7)
         print("\n-----------------\n")
     
+if __name__ == "__main__":
+    unittest.main()

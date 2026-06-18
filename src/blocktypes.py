@@ -67,8 +67,6 @@ def markdown_to_html_node(markdown):
         if block_type == BlockType.PARAGRAPH:
             block_node = paragraph_to_html(block)
             block_nodes.append(block_node)
-        elif block_type == BlockType.QUOTE:
-            pass
         elif block_type == BlockType.UNORDERED_LIST:
             block_node = unordered_list_to_html(block)
             block_nodes.append(block_node)
@@ -80,6 +78,9 @@ def markdown_to_html_node(markdown):
             block_nodes.append(block_node)
         elif block_type == BlockType.HEADING:
             block_node = heading_to_html(block)
+            block_nodes.append(block_node)
+        elif block_type == BlockType.QUOTE:
+            block_node = quote_to_html(block)
             block_nodes.append(block_node)
     return ParentNode("div", block_nodes, None)
 
@@ -127,6 +128,16 @@ def heading_to_html(block):
     heading_child = text_to_children(block_text)
     return ParentNode(f"h{level}", heading_child, None)
 
+def quote_to_html(block):
+
+    new_lines = []
+    lines = block.split("\n")
+    for line in lines:
+        new_lines.append(line.lstrip(">").strip())
+    content = " ".join(new_lines)
+    children = text_to_children(content)
+    return ParentNode("blockquote", children, None)
+    
 def code_to_html(text):
     code_text = text[4:-3]
     text_node = TextNode(code_text, TextType.PLAIN_TEXT, None)

@@ -33,9 +33,10 @@ class LeafNode(HTMLNode):
             raise ValueError("Cannot be valueless")
         if self.tag == None:
             return self.value
+        if self.tag == "img":
+            return f"<{self.tag}{self.props_to_html()}/>"
         else:
             return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
-    
     def __repr__(self):
         TAG = self.tag
         VALUE = self.value
