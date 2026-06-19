@@ -91,7 +91,7 @@ def main():
                 shutil.copy(file_path, dest_path)
             elif os.path.isdir(file_path):
                 rec_copy_stuff(file_path, dest_path)
-    rec_copy_stuff("static", "public")
+    rec_copy_stuff("static", "docs")
     generate_pages_recursive("content", "template.html", "docs", basepath)
     
         
