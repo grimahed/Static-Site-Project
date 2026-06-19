@@ -1,10 +1,16 @@
 import os
 import shutil
+import sys
 from pathlib import Path
 from enum import Enum
 from textnode import *
 from htmlnode import *
 from blocktypes import *
+
+if sys.argv[0]:
+    basepath = sys.argv[0]
+else:
+    basepath = "/"
 #extract stuff
 def extract_title(markdown):
         blocks = markdown_to_blocks(markdown)
@@ -19,7 +25,7 @@ def extract_title(markdown):
         raise Exception("no heading to return")
 
 #generate the page
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"generating page from {from_path} to {dest_path} using {template_path}")
     
     #from_path stuff
@@ -37,23 +43,25 @@ def generate_page(from_path, template_path, dest_path):
     #build thing
     built_html = read_template_file
     built_html2 = built_html.replace("{{ Title }}", title)
-    final_html = built_html2.replace("{{ Content }}", md_html)
-
+    built_html3 = built_html2.replace("{{ Content }}", md_html)
+    built_html4 = built_html3.replace('href="/', 'href="{basepath}')
+    final_html = built_html4.replace('src="/', 'src="{basepath}')
+                                     
     #write the thing
     dirs = os.path.dirname(dest_path)
     os.makedirs(dirs, exist_ok=True)
     with open(dest_path, "w") as d:
         uploaded_html = d.write(final_html)
     
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, baepath):
     for filepath in os.listdir(dir_path_content):
         from_path = os.path.join(dir_path_content, filepath)
         dest_path = os.path.join(dest_dir_path, filepath)   
         if os.path.isfile(from_path):
             html_filepath = str(Path(dest_path).with_suffix(".html"))
-            page = generate_page(from_path, template_path, html_filepath)
+            page = generate_page(from_path, template_path, html_filepath, basepath)
         elif os.path.isdir(from_path):
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
 
 
 
@@ -84,7 +92,7 @@ def main():
             elif os.path.isdir(file_path):
                 rec_copy_stuff(file_path, dest_path)
     rec_copy_stuff("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    generate_pages_recursive("content", "template.html", "public", basepath)
     
         
 
