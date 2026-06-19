@@ -7,8 +7,8 @@ from textnode import *
 from htmlnode import *
 from blocktypes import *
 
-if sys.argv[0]:
-    basepath = sys.argv[0]
+if len(sys.argv) == 2:
+    basepath = sys.argv[1]
 else:
     basepath = "/"
 #extract stuff
@@ -44,8 +44,8 @@ def generate_page(from_path, template_path, dest_path, basepath):
     built_html = read_template_file
     built_html2 = built_html.replace("{{ Title }}", title)
     built_html3 = built_html2.replace("{{ Content }}", md_html)
-    built_html4 = built_html3.replace('href="/', 'href="{basepath}')
-    final_html = built_html4.replace('src="/', 'src="{basepath}')
+    built_html4 = built_html3.replace('href="/', f'href="{basepath}')
+    final_html = built_html4.replace('src="/', f'src="{basepath}')
                                      
     #write the thing
     dirs = os.path.dirname(dest_path)
@@ -92,7 +92,7 @@ def main():
             elif os.path.isdir(file_path):
                 rec_copy_stuff(file_path, dest_path)
     rec_copy_stuff("static", "public")
-    generate_pages_recursive("content", "template.html", "public", basepath)
+    generate_pages_recursive("content", "template.html", "docs", basepath)
     
         
 
